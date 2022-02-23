@@ -169,8 +169,8 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 85233488}
   m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
   m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
@@ -476,6 +476,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4459864850019384740, guid: 6bacecc4f3df9584198879c73a6b6c36,
+        type: 3}
+      propertyPath: lockCursor
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4459864850019384750, guid: 6bacecc4f3df9584198879c73a6b6c36,
         type: 3}
       propertyPath: m_Name
@@ -489,17 +494,17 @@ PrefabInstance:
     - target: {fileID: 4459864851310106426, guid: 6bacecc4f3df9584198879c73a6b6c36,
         type: 3}
       propertyPath: m_BackGroundColor.b
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4459864851310106426, guid: 6bacecc4f3df9584198879c73a6b6c36,
         type: 3}
       propertyPath: m_BackGroundColor.g
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4459864851310106426, guid: 6bacecc4f3df9584198879c73a6b6c36,
         type: 3}
       propertyPath: m_BackGroundColor.r
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
@@ -527,8 +532,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb9f519bde3e23f43afaa401adfddf89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  resolutionX: 20
-  resolutionY: 12
+  resolutionX: 32
+  resolutionY: 24
   distance: 4
   sampleCount: 16
   sampleInterval: 3.25
@@ -542,6 +547,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 275742761}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &275742768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 275742763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01f7a6f9d44616241a4dad2dbea6153c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &331105445
 GameObject:
   m_ObjectHideFlags: 0
@@ -942,19 +959,118 @@ MonoBehaviour:
   moonCycleOffset: 120
   sunCenterDistance: 8
   moonCenterDistance: 8
-  sunRotationDirection: {x: 1, y: 0, z: 0}
-  moonRotationDirection: {x: 1, y: 0, z: 0}
+  sunRotationDirection: {x: 0.9, y: 0, z: 0.1}
+  moonRotationDirection: {x: 0.89, y: 0.01, z: 0.1}
   sunStrengthOverCycle:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: -0.0065078735
+      value: 0.18011475
+      inSlope: 2.4998453
+      outSlope: 2.4998453
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.094630085
+    - serializedVersion: 3
+      time: 0.23101807
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.30668473
+      value: 1.0000017
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.5108087
+      value: 0.02462944
+      inSlope: 0.019495104
+      outSlope: 0.019495104
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.21777105
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.7114353
+      value: 0.5499833
+      inSlope: 9.724619
+      outSlope: 9.724619
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.12806194
+    - serializedVersion: 3
+      time: 0.7956072
+      value: 0.9967041
+      inSlope: 11.2376995
+      outSlope: 11.2376995
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.044508863
+      outWeight: 0
     m_PreInfinity: 2
-    m_PostInfinity: 2
+    m_PostInfinity: 1
     m_RotationOrder: 4
   moonStrengthOverCycle:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.098358154
+      value: -0.00048828125
+      inSlope: 0.009497212
+      outSlope: 0.009497212
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.44860998
+      value: 0.0028381348
+      inSlope: -0.04202203
+      outSlope: -0.04202203
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.093920976
+      outWeight: 0.21023488
+    - serializedVersion: 3
+      time: 0.5788332
+      value: 0.12173128
+      inSlope: 0.4766237
+      outSlope: 0.4766237
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.8842118
+      value: 0.13402356
+      inSlope: -0.33723217
+      outSlope: -0.33723217
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.2557545
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.000529
+      value: -0.002384752
+      inSlope: -0.038149714
+      outSlope: -0.038149714
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.1544623
+      outWeight: 0
     m_PreInfinity: 2
-    m_PostInfinity: 2
+    m_PostInfinity: 1
     m_RotationOrder: 4
 --- !u!1 &566214234
 GameObject:
@@ -1194,14 +1310,14 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 65280
   noise: {fileID: 0}
-  scatterDensity: 0.2
+  scatterDensity: 0.14
   scatterHeight: 256
   scatterPowerOverHeight: 0.8
   scatterColorOverDensity:
     serializedVersion: 2
     key0: {r: 0, g: 0, b: 0, a: 1}
     key1: {r: 0.20016019, g: 0.22006032, b: 0.24528301, a: 1}
-    key2: {r: 1, g: 1, b: 1, a: 0}
+    key2: {r: 0.34509802, g: 0.6103375, b: 1, a: 0}
     key3: {r: 1, g: 1, b: 1, a: 0}
     key4: {r: 1, g: 0.52018994, b: 0.30588233, a: 0}
     key5: {r: 0.377, g: 0, b: 0.009809205, a: 0}
@@ -1302,6 +1418,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86cee567c92f4c84e8e111f0ed3f4ea6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  biomeParamsXConstant: 12516
+  biomeParamsYConstant: 25415
 --- !u!1 &1023448926
 GameObject:
   m_ObjectHideFlags: 0
@@ -1627,6 +1745,100 @@ MonoBehaviour:
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
   treePrefabs: []
+--- !u!1 &1199773849
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1199773853}
+  - component: {fileID: 1199773852}
+  - component: {fileID: 1199773851}
+  - component: {fileID: 1199773850}
+  m_Layer: 0
+  m_Name: Plane
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!64 &1199773850
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199773849}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &1199773851
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199773849}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+--- !u!33 &1199773852
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199773849}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1199773853
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199773849}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.33, y: 197.98, z: 1.37}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1206049150
 GameObject:
   m_ObjectHideFlags: 0
@@ -1774,6 +1986,7 @@ MonoBehaviour:
   caveBiomeMap: {fileID: 2800000, guid: 2f5a45a06a64d3046bcf055d189984e4, type: 3}
   caveMinHeightMap: {fileID: 2800000, guid: bdb0efbb2871c6a439b0c06782ceebc5, type: 3}
   caveMaxHeightMap: {fileID: 2800000, guid: 65f4a45acb93f3f48bad9ec645ba90c0, type: 3}
+  heightMap: {fileID: 2800000, guid: 3d5fc2916a4ee7149a729951d8480cb1, type: 3}
   defaultBiome: {fileID: 749157901}
 --- !u!1 &1270766463
 GameObject:
@@ -2998,6 +3211,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: ChunkPrefab
       objectReference: {fileID: 0}
+    - target: {fileID: 5023239919441658232, guid: 60710246fb7c55246b5dd4c5e81b2b40,
+        type: 3}
+      propertyPath: material
+      value: 
+      objectReference: {fileID: 2100000, guid: a865f9ec01d99234baf506cdec646219, type: 2}
     - target: {fileID: 5023239919441658232, guid: 60710246fb7c55246b5dd4c5e81b2b40,
         type: 3}
       propertyPath: marchingImpl

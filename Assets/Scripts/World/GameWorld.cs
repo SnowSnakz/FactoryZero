@@ -21,7 +21,7 @@ namespace FactoryZero.Worlds
         public WorldGenerator generator;
         public WorldChunk chunkPrefab;
 
-        Dictionary<Vector2Int, WorldChunk> chunks;
+        Dictionary<Vector2Int, WorldChunk> chunks = new Dictionary<Vector2Int, WorldChunk>();
 
         public int seed;
 
@@ -84,6 +84,7 @@ namespace FactoryZero.Worlds
             newChunk.index = chunkIndex;
             newChunk.world = this;
             newChunk.inUse = true;
+            newChunk.transform.position = new Vector3(chunkIndex.x * WorldChunk.chunkWidth, 0, chunkIndex.y * WorldChunk.chunkLength);
 
             if (File.Exists(chunkFile))
             {
@@ -107,6 +108,7 @@ namespace FactoryZero.Worlds
             if(!chunk.hasGenerated || force)
             {
                 generator.onGenerate.Invoke(new GenerateFunctionArgs(this, chunk));
+                chunk.hasGenerated = true;
             }
 
             return chunk;
@@ -169,16 +171,6 @@ namespace FactoryZero.Worlds
                     worldFolder += '_';
                 }
             }
-
-            chunks = new Dictionary<Vector2Int, WorldChunk>();
-
-            for(int x = -5; x < 6; x++)
-            {
-                for (int z = -5; z < 6; z++)
-                {
-                    GenerateChunk(new Vector2Int(x, z), true, false);
-                }
-            }
         }
 
         void OnDestroy()
@@ -199,9 +191,26 @@ namespace FactoryZero.Worlds
             }
         }
 
+        bool init = true;
         // Update is called once per frame
         void FixedUpdate()
         {
+            if(init)
+            {
+                init = false;
+
+
+                chunks = new Dictionary<Vector2Int, WorldChunk>();
+
+                for (int x = -5; x < 6; x++)
+                {
+                    for (int z = -5; z < 6; z++)
+                    {
+                        GenerateChunk(new Vector2Int(x, z), true, false);
+                    }
+                }
+            }
+
             currentCycleTime += Time.fixedDeltaTime;
 
             float cycleTimeNormalized = (currentCycleTime % dayCycleLength) / dayCycleLength;

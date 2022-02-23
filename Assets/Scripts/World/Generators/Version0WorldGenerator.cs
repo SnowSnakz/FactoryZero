@@ -6,13 +6,10 @@ using UnityEngine;
 
 namespace FactoryZero.Worlds.Generators
 {
+    [RequireComponent(typeof(WorldGenerator))]
     public class Version0WorldGenerator : MonoBehaviour
     {
         WorldGenerator generator;
-        private void Start()
-        {
-            generator = GetComponent<WorldGenerator>();
-        }
 
         public float biomeParamsXConstant;
         public float biomeParamsYConstant;
@@ -20,6 +17,11 @@ namespace FactoryZero.Worlds.Generators
         public void OnGenerate(GenerateFunctionArgs args)
         {
             // Debug.Log($"{nameof(Version0WorldGenerator)}.{nameof(OnGenerate)}({nameof(GenerateFunctionArgs)} {nameof(args)}) [chunkIndex=({args.Chunk.index.x}, {args.Chunk.index.y}),world={args.World.worldName}]");
+
+            if(generator == null)
+            {
+                generator = GetComponent<WorldGenerator>();
+            }
 
             WorldChunk chunk = args.Chunk;
             GameWorld world = args.World;
@@ -40,7 +42,13 @@ namespace FactoryZero.Worlds.Generators
                     biomeParams.x = (xParam.Value + 1f) * 0.5f;
                     biomeParams.y = (yParam.Value + 1f) * 0.5f;
 
-                    float height = world.biomeManager.GetHeightByParameters(biomeParams.x, biomeParams.y);
+                    float height = world.biomeManager.GetHeightByParameters(biomeParams.x, biomeParams.y) * chunk.size.y;
+
+                    for(int y = 0; y < Mathf.Min(height, chunk.size.y); y++)
+                    {
+                        IVoxel voxel = chunk.GetVoxel(new Vector3Int(x, y, z));
+                        voxel.Volume = Mathf.Clamp01((height - y) / 3f);
+                    }
                 }
             }
         }

@@ -119,7 +119,7 @@ namespace FactoryZero.Noise
 
             if (domainWarp == null)
             {
-                noise = new FastNoiseLite(args.Seed);
+                domainWarp = new FastNoiseLite(args.Seed);
                 InitDomainWarp();
             }
             else

@@ -38,7 +38,7 @@ namespace FactoryZero.Display
             overlayMaterial.mainTexture = texture;
 
             Vector3[] frustumCorners = new Vector3[4];
-            mcamera.CalculateFrustumCorners(new Rect(0, 0, 1, 1), distance, Camera.MonoOrStereoscopicEye.Mono, frustumCorners);
+            mcamera.CalculateFrustumCorners(new Rect(0, 0, 1, 1), distance + 1f, Camera.MonoOrStereoscopicEye.Mono, frustumCorners);
 
             mesh = new Mesh();
 
@@ -72,6 +72,7 @@ namespace FactoryZero.Display
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
 
+            overlayRenderer.transform.localPosition = new Vector3(0, 0, -0.1f);
             overlayRenderer.GetComponent<MeshFilter>().mesh = mesh;
         }
 
@@ -88,13 +89,13 @@ namespace FactoryZero.Display
                 {
                     Vector3 direction = transform.rotation * new Vector3(((x - (resolutionX / 2f)) / resolutionX) * (mcamera.fieldOfView / 180) * (mcamera.pixelWidth / distance), (y - (resolutionY / 2f)) / resolutionY * (mcamera.fieldOfView / 180) * (mcamera.pixelHeight / distance), distance + sampleCount * sampleInterval).normalized;
 
-                    Color lightColor = Color.black;
+                    Color lightColor = Color.white;
                     foreach(Light light in lights)
                     {
                         switch(light.type)
                         {
                             case LightType.Directional:
-                                lightColor += Mathf.Max(0, Vector3.Dot(direction, -light.transform.forward)) * light.color;
+                                lightColor -= Mathf.Max(0, Vector3.Dot(direction, light.transform.forward) * light.intensity) * light.color;
                                 break;
                         } 
                     }
@@ -131,7 +132,7 @@ namespace FactoryZero.Display
                                 }
 
                                 float scatterIntensity = biome.scatterDensity * (Mathf.Pow(Mathf.Clamp01((biome.scatterHeight - samplePosition.y) / biome.scatterHeight), biome.scatterPowerOverHeight));
-                                scatters[biome] += scatterIntensity;
+                                lightColor -= biome.scatterColorOverDensity.Evaluate(scatterIntensity);
                                 continue;
                             }
                         }
@@ -141,7 +142,7 @@ namespace FactoryZero.Display
                             switch (light.type)
                             {
                                 case LightType.Point:
-                                    lightColor += (Mathf.Max(0, 1 - Vector3.Distance(samplePosition, light.transform.position) / light.range) * light.color) * (s / (sampleCount * sampleInterval));
+                                    lightColor += (Mathf.Max(0, 1 - Vector3.Distance(samplePosition, light.transform.position) / light.range) * light.color) * (s / (sampleCount * sampleInterval)) * light.intensity;
                                     break;
                             }
                         }
@@ -152,9 +153,9 @@ namespace FactoryZero.Display
 
                         biome = voxel.Biome;
 
-                        if (voxel.Volume >= 0)
+                        if (voxel.Volume >= 0.5f)
                         {
-                            lightColor = Color.black;
+                            lightColor = Color.white;
                             scatters[voxel.Biome] = 0f;
                             continue;
                         }
@@ -165,13 +166,9 @@ namespace FactoryZero.Display
                                 scatters.Add(biome, 0f);
                             }
 
-                            scatters[voxel.Biome] += biome.scatterDensity * (Mathf.Pow(Mathf.Clamp01((samplePosition.y - biome.scatterHeight) / biome.scatterHeight), biome.scatterPowerOverHeight));
+                            float scatterIntensity = biome.scatterDensity * (Mathf.Pow(Mathf.Clamp01((biome.scatterHeight - samplePosition.y) / biome.scatterHeight), biome.scatterPowerOverHeight));
+                            lightColor *= biome.scatterColorOverDensity.Evaluate(scatterIntensity);
                         }
-                    }
-
-                    foreach(KeyValuePair<VoxelBiome, float> kvp in scatters)
-                    {
-                        lightColor *= Color.Lerp(Color.black, kvp.Key.scatterColorOverDensity.Evaluate(kvp.Value), Mathf.Clamp01(kvp.Value));
                     }
 
                     texture.SetPixel(x, y, lightColor);
