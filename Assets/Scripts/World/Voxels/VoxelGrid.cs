@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace FactoryZero.Voxels
 {
-    [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+    [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
     public class VoxelGrid : MonoBehaviour, IGrid3D<IVoxel>
     {
         public Vector3Int size;
@@ -60,6 +60,8 @@ namespace FactoryZero.Voxels
             {
                 InitAll();
 
+                hasChanged = true;
+
                 int index1d = TranslateIndex(x, y, z);
                 voxels[index1d] = value;
             }
@@ -72,12 +74,15 @@ namespace FactoryZero.Voxels
         private bool readOnly;
         public bool IsReadOnly => readOnly;
 
+        public bool exportMesh;
+
         Action changeAction;
 
         Mesh mesh;
 
         MeshFilter mFilter;
         MeshRenderer mRenderer;
+        MeshCollider mCollider;
 
         bool hasInit = false;
         void InitAll()
@@ -105,6 +110,7 @@ namespace FactoryZero.Voxels
         {
             mFilter = GetComponent<MeshFilter>();
             mRenderer = GetComponent<MeshRenderer>();
+            mCollider = GetComponent<MeshCollider>();
 
             regenMesh = RegenMesh;
             updateMesh = UpdateMesh;
@@ -120,7 +126,8 @@ namespace FactoryZero.Voxels
 
             mesh = new Mesh();
             mesh.name = $"Chunk_{chunk.index.x}x_{chunk.index.y}z__ChunkBit_{bitIndex.x}x_{bitIndex.y}y_{bitIndex.z}z_VoxelMesh";
-            mesh.bounds = new Bounds(new Vector3(size.x * 0.5f, size.y * 0.5f, size.z * 0.5f), new Vector3(size.x, size.y, size.z));
+
+            mesh.MarkDynamic();
 
             mFilter.mesh = mesh;
 
@@ -135,9 +142,44 @@ namespace FactoryZero.Voxels
         bool isMarching;
         MarchingFunctionArgs marching;
 
+        class MarchingGrid : IGrid3D<IVoxel>
+        {
+            Vector3Int size;
+
+            IVoxel[] voxels;
+
+            public MarchingGrid(GameWorld world, Vector3Int offset, Vector3Int size)
+            {
+                this.size = size;
+
+                voxels = new IVoxel[size.x * size.y * size.z];
+
+                for(int x = 0; x < size.x; x++)
+                {
+                    for (int y = 0; y < size.y; y++)
+                    {
+                        for (int z = 0; z < size.z; z++)
+                        {
+                            voxels[x + y * size.x + z * size.x * size.y] = world.GetVoxel(x + offset.x, offset.y + y, z + offset.y);
+                        }
+                    }
+                }
+            }
+
+            public IVoxel this[int x, int y, int z] { get => voxels[x + y * size.x + z * size.x * size.y]; set => throw new NotImplementedException(); }
+
+            public int Width => size.x;
+
+            public int Height => size.y;
+
+            public int Length => size.z;
+
+            public bool IsReadOnly => true;
+        }
+
         void RegenMesh()
         {
-            marching = new MarchingFunctionArgs(this, 0.5f);
+            marching = new MarchingFunctionArgs(new MarchingGrid(chunk.world, new Vector3Int(chunk.index.x * chunk.size.x + bitIndex.x * chunk.voxelBitSize.x, bitIndex.y * chunk.voxelBitSize.y, chunk.index.y * chunk.size.z + bitIndex.z * chunk.voxelBitSize.z), size + Vector3Int.one), 0.5f);
             chunk.marchingImpl.onMarch.Invoke(marching);
             updateMesh.ExecuteOnMainThread();
         }
@@ -190,18 +232,28 @@ namespace FactoryZero.Voxels
             mesh.SetUVs(1, uv1);
             mesh.SetUVs(2, uv2);
 
+
+            int i;
+
             Material[] mats = new Material[smi+1];
-            for(int i = 0; i < smi+1; i++)
+            for(i = 0; i < smi+1; i++)
             {
                 mats[i] = material;
-                foreach (List<int> sinds in inds)
-                {
-                    mesh.SetIndices(sinds, MeshTopology.Triangles, i++);
-                }
             }
+
+            i = 0;
+            foreach (List<int> sinds in inds)
+            {
+                mesh.SetIndices(sinds, MeshTopology.Triangles, i++);
+            }
+
+            mesh.RecalculateNormals();
+
+            mesh.bounds = new Bounds(new Vector3(size.x * 0.5f, size.y * 0.5f, size.z * 0.5f), new Vector3(size.x, size.y, size.z));
 
             mRenderer.materials = mats;
             mFilter.mesh = mesh;
+            mCollider.sharedMesh = mesh;
 
             isMarching = false;
         }
@@ -218,8 +270,10 @@ namespace FactoryZero.Voxels
                 {
                     if (hasChanged)
                     {
+                        hasChanged = false;
                         isMarching = true;
                         lastUpdateTime = 0.25f;
+                        regenMesh.ExecuteAsync();
                     }
                 }
             }

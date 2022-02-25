@@ -1,4 +1,5 @@
 ﻿using FactoryZero.Voxels;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -60,7 +61,7 @@ namespace FactoryZero.Worlds
 
         public WorldChunk GetChunk(Vector2Int chunkIndex)
         {
-            WorldChunk v = null;
+            WorldChunk v;
 
             if (!chunks.TryGetValue(chunkIndex, out v))
             {
@@ -84,7 +85,65 @@ namespace FactoryZero.Worlds
             newChunk.index = chunkIndex;
             newChunk.world = this;
             newChunk.inUse = true;
-            newChunk.transform.position = new Vector3(chunkIndex.x * WorldChunk.chunkWidth, 0, chunkIndex.y * WorldChunk.chunkLength);
+            newChunk.transform.position = new Vector3(chunkIndex.x * newChunk.size.x, 0, chunkIndex.y * newChunk.size.z);
+            chunks.Add(chunkIndex, newChunk);
+
+            /*
+            if (chunks.ContainsKey(chunkIndex - Vector2Int.left))
+            {
+                WorldChunk c = chunks[chunkIndex - Vector2Int.left];
+                
+                for(int y = 0; y < c.size.y; y++)
+                {
+                    for (int z = 0; z < c.size.z; z++)
+                    {
+                        c.SetVoxel(new Vector3Int(c.size.x, y, z), newChunk.GetVoxel(new Vector3Int(0, y, z)));
+                    }
+                }
+            }
+
+            if (chunks.ContainsKey(chunkIndex - Vector2Int.up))
+            {
+                WorldChunk c = chunks[chunkIndex - Vector2Int.up];
+
+                for (int y = 0; y < c.size.y; y++)
+                {
+                    for (int x = 0; x < c.size.z; x++)
+                    {
+                        c.SetVoxel(new Vector3Int(c.size.x, y, x), newChunk.GetVoxel(new Vector3Int(0, y, x)));
+                    }
+                }
+
+            }
+
+            if (chunks.ContainsKey(chunkIndex - Vector2Int.down))
+            {
+                WorldChunk c = chunks[chunkIndex - Vector2Int.down];
+
+                for (int y = 0; y < c.size.y; y++)
+                {
+                    for (int x = 0; x < c.size.z; x++)
+                    {
+                        newChunk.SetVoxel(new Vector3Int(c.size.x, y, x), c.GetVoxel(new Vector3Int(0, y, x)));
+                    }
+                }
+
+            }
+
+            if (chunks.ContainsKey(chunkIndex - Vector2Int.right))
+            {
+                WorldChunk c = chunks[chunkIndex - Vector2Int.right];
+
+                for (int y = 0; y < c.size.y; y++)
+                {
+                    for (int z = 0; z < c.size.z; z++)
+                    {
+                        newChunk.SetVoxel(new Vector3Int(c.size.x, y, z), c.GetVoxel(new Vector3Int(0, y, z)));
+                    }
+                }
+
+            }
+            */
 
             if (File.Exists(chunkFile))
             {
@@ -146,7 +205,42 @@ namespace FactoryZero.Worlds
             return targetChunk;
         }
 
+        public IVoxel GetVoxel(int x, int y, int z)
+        {
+            int nx, nz;
+            if (Math.Sign(x) < 0)
+            {
+                nx = Mathf.CeilToInt((float)Mathf.Abs(x) / chunkPrefab.size.x) * Math.Sign(x);
+            }
+            else
+            {
+                nx = Mathf.FloorToInt((float)Mathf.Abs(x) / chunkPrefab.size.x) * Math.Sign(x);
+            }
+            
+            if (Math.Sign(z) < 0)
+            {
+                nz = Mathf.CeilToInt((float)Mathf.Abs(z) / chunkPrefab.size.z) * Math.Sign(z);
+            }
+            else
+            {
+                nz = Mathf.FloorToInt((float)Mathf.Abs(z) / chunkPrefab.size.z) * Math.Sign(z);
+            }
 
+            Vector2Int chunkIndex = new Vector2Int(nx, nz);
+
+            if(chunks.ContainsKey(chunkIndex))
+            {
+                WorldChunk chunk = chunks[chunkIndex];
+
+                Vector2Int offset = chunkIndex * new Vector2Int(chunkPrefab.size.x, chunkPrefab.size.z);
+
+                Vector3Int pos = new Vector3Int(x - offset.x, y, z - offset.y);
+
+                return chunk.GetVoxel(pos);
+            }
+
+            return null;
+        }
 
         public WorldChunk GetChunk(int x, int y)
         {
@@ -213,15 +307,15 @@ namespace FactoryZero.Worlds
 
             currentCycleTime += Time.fixedDeltaTime;
 
-            float cycleTimeNormalized = (currentCycleTime % dayCycleLength) / dayCycleLength;
+            float cycleTimeNormalized = currentCycleTime / dayCycleLength;
 
             sunLight.transform.localRotation = Quaternion.Euler(sunRotationDirection * 360f * cycleTimeNormalized);
             sunLight.transform.localPosition = sunLight.transform.localRotation * Vector3.back * sunCenterDistance;
-            sunLight.intensity = sunStrengthOverCycle.Evaluate(cycleTimeNormalized);
+            sunLight.intensity = Mathf.Clamp01(Vector3.Dot(sunLight.transform.forward, Vector3.down));
 
-            moonLight.transform.localRotation = Quaternion.Euler(moonRotationDirection * 360f * (((currentCycleTime + moonCycleOffset) % dayCycleLength) / dayCycleLength));
+            moonLight.transform.localRotation = Quaternion.Euler(moonRotationDirection * 360f * (cycleTimeNormalized + moonCycleOffset));
             moonLight.transform.localPosition = moonLight.transform.localRotation * Vector3.back * moonCenterDistance;
-            moonLight.intensity = moonStrengthOverCycle.Evaluate(cycleTimeNormalized);
+            moonLight.intensity = Mathf.Clamp01(Vector3.Dot(moonLight.transform.forward, Vector3.down));
         }
     }
 }

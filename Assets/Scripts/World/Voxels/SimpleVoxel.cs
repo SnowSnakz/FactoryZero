@@ -60,7 +60,7 @@ namespace FactoryZero.Voxels
 
         public VoxelBiome Biome 
         { 
-            get => throw new NotImplementedException(); 
+            get => biome; 
             set
             {
                 if (readOnly)

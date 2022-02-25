@@ -9,8 +9,12 @@ namespace FactoryZero.Voxels
     public class VoxelMaterial : MonoBehaviour
     {
         [Serializable]
-        public class VoxelMaterialTickEvent : UnityEvent<VoxelTickEventArgs>
+        public class VoxelMaterialTickEvent : SerializableFunction<VoxelTickEventArgs, VoxelMaterialTickEvent.Event>
         {
+            [Serializable]
+            public class Event : UnityEvent<VoxelTickEventArgs>
+            {
+            }
         }
 
         public string internalName;

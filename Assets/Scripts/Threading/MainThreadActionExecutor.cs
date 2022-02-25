@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -70,10 +71,17 @@ namespace FactoryZero.Threading
 
         void FixedUpdate()
         {
+            DateTime startTime = DateTime.UtcNow;
             while (mainThreadActions.Count > 0)
             {
                 Action action = mainThreadActions.Dequeue();
                 action?.Invoke();
+
+                DateTime stopTime = DateTime.UtcNow;
+                if(stopTime - startTime >= TimeSpan.FromMilliseconds(10))
+                {
+                    break;
+                }
             }
         }
     }

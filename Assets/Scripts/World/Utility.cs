@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace FactoryZero
@@ -16,7 +17,7 @@ namespace FactoryZero
 
         public static void ExecuteAsync(this Action action)
         {
-            MainThreadActionExecutor.alternateThreadActions.Enqueue(action);
+            new Task(action).Start();
         }
 
         public static void GenerateGridMesh(Quaternion direction, List<Vector3> vertices, List<int> indices, List<Vector2> uvs, Vector3 offset, int resolutionX, int resolutionY, float cellSizeX, float cellSizeY, bool clockwise = true)

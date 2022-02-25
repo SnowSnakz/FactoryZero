@@ -328,6 +328,9 @@ namespace FactoryZero.Marching
             new Vector3Int(0, 1, 1)
         };
 
+        public VoxelMaterial defaultMaterial;
+        public VoxelBiome defaultBiome;
+
         public void OnMarch(MarchingFunctionArgs args)
         {
             IVoxel[] slice = new IVoxel[8];
@@ -360,6 +363,26 @@ namespace FactoryZero.Marching
         MarchingMeshVertex VertexInterp(float isoLevel, Vector3 offset, IVoxel a, IVoxel b, int cornerA, int cornerB)
         {
             float mu;
+
+            if(a == null)
+            {
+                a = b;
+            }
+
+            if(b == null)
+            {
+                b = a;
+            }
+
+            if(a == null)
+            {
+                a = new SimpleVoxel(null, isoLevel, false, defaultMaterial, defaultBiome);
+            }
+
+            if(b == null)
+            {
+                b = new SimpleVoxel(null, isoLevel, false, defaultMaterial, defaultBiome);
+            }
 
             MarchingMeshVertex vert = new MarchingMeshVertex();
 
@@ -407,6 +430,8 @@ namespace FactoryZero.Marching
             {
                 mu = (isoLevel - a.Volume) / (b.Volume - a.Volume);
 
+                vert.position = Vector3.Lerp(cubeCorners[cornerA], cubeCorners[cornerB], mu);
+
                 vert.biomeParameters = Vector2.Lerp(a.BiomeParameters, b.BiomeParameters, mu);
                 vert.hasGrass = (mu < 0.5f) ? a.IsGrassy && matA.allowGrass : b.IsGrassy && matB.allowGrass;
                 vert.grassColor = Color.Lerp(matA.grassColor, matB.grassColor, mu);
@@ -425,14 +450,22 @@ namespace FactoryZero.Marching
         {
             int cubeindex = 0;
 
-            if (voxels[0].Volume < isoLevel) cubeindex |= 1;
-            if (voxels[1].Volume < isoLevel) cubeindex |= 2;
-            if (voxels[2].Volume < isoLevel) cubeindex |= 4;
-            if (voxels[3].Volume < isoLevel) cubeindex |= 8;
-            if (voxels[4].Volume < isoLevel) cubeindex |= 16;
-            if (voxels[5].Volume < isoLevel) cubeindex |= 32;
-            if (voxels[6].Volume < isoLevel) cubeindex |= 64;
-            if (voxels[7].Volume < isoLevel) cubeindex |= 128;
+            if (voxels[0]?.Volume < isoLevel) cubeindex |= 1;
+            if (voxels[1]?.Volume < isoLevel) cubeindex |= 2;
+            if (voxels[2]?.Volume < isoLevel) cubeindex |= 4;
+            if (voxels[3]?.Volume < isoLevel) cubeindex |= 8;
+            if (voxels[4]?.Volume < isoLevel) cubeindex |= 16;
+            if (voxels[5]?.Volume < isoLevel) cubeindex |= 32;
+            if (voxels[6]?.Volume < isoLevel) cubeindex |= 64;
+            if (voxels[7]?.Volume < isoLevel) cubeindex |= 128;
+
+            bool shouldMarch = true;
+            foreach(IVoxel voxel in voxels)
+            {
+                if (voxel == null) shouldMarch = false;
+            }
+
+            if (!shouldMarch) return;
 
             if (edgeTable[cubeindex] == 0)
                 return;

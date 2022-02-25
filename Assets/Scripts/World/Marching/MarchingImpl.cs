@@ -11,10 +11,19 @@ namespace FactoryZero.Marching
     public class MarchingImpl : MonoBehaviour
     {
         [Serializable]
-        public class MarchFunction : UnityEvent<MarchingFunctionArgs>
+        public class MarchFunction : SerializableFunction<MarchingFunctionArgs, MarchFunction.Event>
         {
+            [Serializable]
+            public class Event : UnityEvent<MarchingFunctionArgs>
+            {
+            }
         }
 
         public MarchFunction onMarch;
+
+        private void Start()
+        {
+            onMarch.Init();
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FactoryZero.Voxels;
 using FactoryZero.Worlds;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -106,7 +107,7 @@ namespace FactoryZero.Display
                     {
                         VoxelBiome biome = world.biomeManager.defaultBiome;
                         Vector3 samplePosition = direction * (distance + s * sampleInterval);
-                        Vector2Int sampleChunkIndex = new Vector2Int(Mathf.FloorToInt(samplePosition.x / WorldChunk.chunkWidth), Mathf.FloorToInt(samplePosition.z / WorldChunk.chunkLength));
+                        Vector2Int sampleChunkIndex = new Vector2Int(Mathf.FloorToInt(samplePosition.x / world.chunkPrefab.size.x), Mathf.FloorToInt(samplePosition.z / world.chunkPrefab.size.z));
 
                         bool changedChunks = false;
                         if(currentChunk == null)
@@ -148,26 +149,34 @@ namespace FactoryZero.Display
                         }
 
 
-                        Vector3Int voxelIndex = new Vector3Int(Mathf.FloorToInt(samplePosition.x % currentChunk.size.x), Mathf.FloorToInt(samplePosition.y), Mathf.FloorToInt(samplePosition.z % currentChunk.size.z));
+                        Vector3Int voxelIndex = new Vector3Int(Mathf.FloorToInt(samplePosition.x - currentChunk.index.x * currentChunk.size.x), Mathf.FloorToInt(samplePosition.y), Mathf.FloorToInt(samplePosition.z - currentChunk.index.y * currentChunk.size.z));
+                        voxelIndex = Vector3Int.Min(Vector3Int.Max(Vector3Int.zero, voxelIndex), currentChunk.size - Vector3Int.one);
+                        
                         IVoxel voxel = currentChunk.GetVoxel(voxelIndex);
 
-                        biome = voxel.Biome;
+                        if(voxel != null)
+                        {
+                            biome = voxel.Biome;
 
-                        if (voxel.Volume >= 0.5f)
-                        {
-                            lightColor = Color.white;
-                            scatters[voxel.Biome] = 0f;
-                            continue;
-                        }
-                        else
-                        {
-                            if (!scatters.ContainsKey(biome))
+                            if (biome != null)
                             {
-                                scatters.Add(biome, 0f);
-                            }
+                                if (voxel.Volume >= 0.5f)
+                                {
+                                    lightColor = Color.white;
+                                    scatters[voxel.Biome] = 0f;
+                                    continue;
+                                }
+                                else
+                                {
+                                    if (!scatters.ContainsKey(biome))
+                                    {
+                                        scatters.Add(biome, 0f);
+                                    }
 
-                            float scatterIntensity = biome.scatterDensity * (Mathf.Pow(Mathf.Clamp01((biome.scatterHeight - samplePosition.y) / biome.scatterHeight), biome.scatterPowerOverHeight));
-                            lightColor *= biome.scatterColorOverDensity.Evaluate(scatterIntensity);
+                                    float scatterIntensity = biome.scatterDensity * (Mathf.Pow(Mathf.Clamp01((biome.scatterHeight - samplePosition.y) / biome.scatterHeight), biome.scatterPowerOverHeight));
+                                    lightColor *= biome.scatterColorOverDensity.Evaluate(scatterIntensity);
+                                }
+                            }
                         }
                     }
 

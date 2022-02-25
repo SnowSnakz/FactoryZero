@@ -527,7 +527,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 275742763}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb9f519bde3e23f43afaa401adfddf89, type: 3}
   m_Name: 
@@ -817,7 +817,7 @@ GameObject:
   - component: {fileID: 406644903}
   - component: {fileID: 406644904}
   m_Layer: 0
-  m_Name: SimplexFractal2
+  m_Name: ValueCubicNoise
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -850,19 +850,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   onGenerateNoise:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 406644904}
-        m_MethodName: OnGenerateNoise
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+    impl:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 406644904}
+          m_MethodName: OnGenerateNoise
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!114 &406644904
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -876,19 +877,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   noiseType: 4
-  rotationType3D: 2
-  seed: 1337
-  frequency: 0.015
+  rotationType3D: 1
+  seed: 1976
+  frequency: 0.005
   fractalType: 1
-  octaves: 2
+  octaves: 4
   lacunarity: 1.7
   gain: 0.5
   weightedStrength: 0.2
   pingPongStrength: 2
   distanceFunction: 1
   returnType: 1
-  jitter: 1
-  enableDomainWarp: 1
+  jitter: 0.04
+  enableDomainWarp: 0
   domainWarpType: 0
   domainWarpRotationType3D: 2
   domainWarpAmplitude: 80
@@ -957,8 +958,8 @@ MonoBehaviour:
   dataPath: 
   currentCycleTime: 0
   moonCycleOffset: 120
-  sunCenterDistance: 8
-  moonCenterDistance: 8
+  sunCenterDistance: 25
+  moonCenterDistance: 25
   sunRotationDirection: {x: 0.9, y: 0, z: 0.1}
   moonRotationDirection: {x: 0.89, y: 0.01, z: 0.1}
   sunStrengthOverCycle:
@@ -1139,19 +1140,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   onMarch:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 624710473}
-        m_MethodName: OnMarch
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+    impl:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 624710473}
+          m_MethodName: OnMarch
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!114 &624710473
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1165,6 +1167,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isoLevel: 0.5
+  defaultMaterial: {fileID: 1817098075}
+  defaultBiome: {fileID: 749157901}
 --- !u!4 &624710474
 Transform:
   m_ObjectHideFlags: 0
@@ -1316,15 +1320,15 @@ MonoBehaviour:
   scatterColorOverDensity:
     serializedVersion: 2
     key0: {r: 0, g: 0, b: 0, a: 1}
-    key1: {r: 0.20016019, g: 0.22006032, b: 0.24528301, a: 1}
-    key2: {r: 0.34509802, g: 0.6103375, b: 1, a: 0}
+    key1: {r: 0.4811321, g: 0, b: 0.033970922, a: 1}
+    key2: {r: 0.764151, g: 0.37629986, b: 0, a: 0}
     key3: {r: 1, g: 1, b: 1, a: 0}
     key4: {r: 1, g: 0.52018994, b: 0.30588233, a: 0}
     key5: {r: 0.377, g: 0, b: 0.009809205, a: 0}
     key6: {r: 0, g: 0, b: 0, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 0
-    ctime1: 33539
+    ctime1: 21588
     ctime2: 63029
     ctime3: 63029
     ctime4: 62644
@@ -1393,19 +1397,20 @@ MonoBehaviour:
   materials: {fileID: 229416066}
   heightMap: {fileID: 2800000, guid: 3d5fc2916a4ee7149a729951d8480cb1, type: 3}
   onGenerate:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 881861450}
-        m_MethodName: OnGenerate
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+    impl:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 881861450}
+          m_MethodName: OnGenerate
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!114 &881861450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1420,6 +1425,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   biomeParamsXConstant: 12516
   biomeParamsYConstant: 25415
+  dirt: {fileID: 1817098075}
+  stone: {fileID: 1023448928}
+  defaultBiome: {fileID: 749157901}
 --- !u!1 &1023448926
 GameObject:
   m_ObjectHideFlags: 0
@@ -1468,15 +1476,16 @@ MonoBehaviour:
   biomeColorStrength: 0
   color: {r: 0.48780707, g: 0.5004228, b: 0.509434, a: 0}
   allowGrass: 1
-  grassColorBiomeStrength: 0
+  grassColorBiomeStrength: 0.2
   grassColor: {r: 0.39822888, g: 0.5034928, b: 0.5377358, a: 0}
   toolType: pickaxe
   toolLevel: 1
   resistance: 1.25
   blastResistance: 0.8
   onVoxelTick:
-    m_PersistentCalls:
-      m_Calls: []
+    impl:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!1 &1026402130
 GameObject:
   m_ObjectHideFlags: 0
@@ -1835,7 +1844,8 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.33, y: 197.98, z: 1.37}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1468625984}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2102,6 +2112,142 @@ Transform:
   m_Father: {fileID: 566214235}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1364926608
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1364926610}
+  - component: {fileID: 1364926609}
+  m_Layer: 0
+  m_Name: ThreadedExecutor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1364926609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1364926608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e1690fa5d32a0b41aca7182c08c13e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  threadCount: 4
+--- !u!4 &1364926610
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1364926608}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -82.35705, y: 118.37787, z: -101.10437}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1468625983
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1468625984}
+  - component: {fileID: 1468625985}
+  m_Layer: 0
+  m_Name: Point Light
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1468625984
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1468625983}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.29, y: 1.81, z: 5.76}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1199773853}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!108 &1468625985
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1468625983}
+  m_Enabled: 1
+  serializedVersion: 10
+  m_Type: 2
+  m_Shape: 0
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Intensity: 1
+  m_Range: 26.315556
+  m_SpotAngle: 30
+  m_InnerSpotAngle: 21.80208
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
 --- !u!1 &1512550876
 GameObject:
   m_ObjectHideFlags: 0
@@ -2521,15 +2667,16 @@ MonoBehaviour:
   biomeColorStrength: 0
   color: {r: 0.745283, g: 0.4190917, b: 0.20741367, a: 0}
   allowGrass: 1
-  grassColorBiomeStrength: 0
+  grassColorBiomeStrength: 1
   grassColor: {r: 1, g: 1, b: 1, a: 0}
   toolType: shovel
   toolLevel: 1
   resistance: 0.25
   blastResistance: 0.1
   onVoxelTick:
-    m_PersistentCalls:
-      m_Calls: []
+    impl:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!1 &1877540251
 GameObject:
   m_ObjectHideFlags: 0
@@ -3221,6 +3368,21 @@ PrefabInstance:
       propertyPath: marchingImpl
       value: 
       objectReference: {fileID: 624710472}
+    - target: {fileID: 5023239919441658232, guid: 60710246fb7c55246b5dd4c5e81b2b40,
+        type: 3}
+      propertyPath: voxelBitSize.x
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 5023239919441658232, guid: 60710246fb7c55246b5dd4c5e81b2b40,
+        type: 3}
+      propertyPath: voxelBitSize.y
+      value: 128
+      objectReference: {fileID: 0}
+    - target: {fileID: 5023239919441658232, guid: 60710246fb7c55246b5dd4c5e81b2b40,
+        type: 3}
+      propertyPath: voxelBitSize.z
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 6794439975386747165, guid: 60710246fb7c55246b5dd4c5e81b2b40,
         type: 3}
       propertyPath: m_RootOrder

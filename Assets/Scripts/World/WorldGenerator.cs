@@ -10,8 +10,12 @@ namespace FactoryZero.Worlds
     public class WorldGenerator : MonoBehaviour
     {
         [Serializable]
-        public class GenerateFunction : UnityEvent<GenerateFunctionArgs>
+        public class GenerateFunction : SerializableFunction<GenerateFunctionArgs, GenerateFunction.Event>
         {
+            [Serializable]
+            public class Event : UnityEvent<GenerateFunctionArgs>
+            {
+            }
         }
 
         public NoiseImpl noise;

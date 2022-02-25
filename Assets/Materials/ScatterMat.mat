@@ -64,8 +64,8 @@ Material:
     - _ColorMode: 0
     - _Cull: 2
     - _Cutoff: 0.5
-    - _DepthFactor: 10.14
-    - _DepthPow: 0.26
+    - _DepthFactor: 3.28
+    - _DepthPow: 1.54
     - _DetailNormalMapScale: 1
     - _DistortionBlend: 0.5
     - _DistortionEnabled: 0

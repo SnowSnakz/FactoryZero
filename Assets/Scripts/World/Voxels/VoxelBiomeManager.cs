@@ -38,6 +38,8 @@ namespace FactoryZero.Voxels
 
         public void Rearrange(string[] newOrder)
         {
+            Init();
+
             VoxelBiome[] newArray = new VoxelBiome[Math.Max(newOrder.Length, biomes.Count)];
 
             int count = 1;
@@ -66,11 +68,21 @@ namespace FactoryZero.Voxels
 
         public VoxelBiome GetBiomeByIndex(int index)
         {
-            return Biomes[index];
+            Init();
+
+            VoxelBiome[] bs = Biomes;
+            if(index >= bs.Length || index < 0)
+            {
+                return null;
+            }
+
+            return bs[index];
         }
 
         public float GetHeightByParameters(float x, float y)
         {
+            Init();
+
             x = Mathf.Clamp01(x);
             y = Mathf.Clamp01(y);
 
@@ -90,6 +102,8 @@ namespace FactoryZero.Voxels
 
         public VoxelBiome GetBiomeByParameters(float x, float y, float height, bool includeCaves = true)
         {
+            Init();
+
             int xx = Mathf.FloorToInt(Mathf.Abs(x) * (convertedBiomeMap.Width - 1));
             int yy = Mathf.FloorToInt(Mathf.Abs(y) * (convertedBiomeMap.Height - 1));
 
@@ -112,6 +126,8 @@ namespace FactoryZero.Voxels
         {
             get
             {
+                Init();
+
                 string[] ids = new string[biomes.Count];
 
                 for(int i = 0; i < ids.Length; i++)
@@ -127,7 +143,9 @@ namespace FactoryZero.Voxels
         {
             get
             {
-                if(biomesArray == null)
+                Init();
+
+                if (biomesArray == null)
                 {
                     biomesArray = biomes.ToArray();
                 }
@@ -143,101 +161,112 @@ namespace FactoryZero.Voxels
             }
         }
 
+        bool hasInit;
+        void Init()
+        {
+            if(!hasInit)
+            {
+                hasInit = true;
+
+                biomesArray = FindObjectsOfType<VoxelBiome>();
+                biomes.AddRange(biomesArray);
+
+                Dictionary<Color32, VoxelBiome> mappedBiomes = new Dictionary<Color32, VoxelBiome>();
+
+                foreach (VoxelBiome b in biomes)
+                {
+                    if (b.isMapped)
+                    {
+                        mappedBiomes[b.mappedColor] = b;
+                    }
+                }
+
+                if (defaultBiome == null)
+                {
+                    Debug.LogWarning($"It might be a good idea to specify a Default Biome.");
+                }
+
+                if (biomeMap == null)
+                {
+                    throw new NullReferenceException($"Please specify a Biome Map before starting.");
+                }
+
+                if (!biomeMap.isReadable)
+                {
+                    throw new InvalidOperationException($"Please make the texture \"{biomeMap.name}\" readable by navigating to it in the asset browser and ticking the Read/Write Checkbox and hitting Apply.");
+                }
+
+                if (biomeMap.format != TextureFormat.RGBA32)
+                {
+                    throw new InvalidOperationException($"Please ensure that the pixel format of \"{biomeMap.name}\" is RGBA32 and that it is uncompressed.");
+                }
+
+                convertedCaveBiomeMap = new IntGrid2D(caveBiomeMap.width, caveBiomeMap.height);
+                for (int x = 0; x < convertedCaveBiomeMap.Width; x++)
+                {
+                    for (int y = 0; y < convertedCaveBiomeMap.Height; y++)
+                    {
+                        Color32 pixel = caveBiomeMap.GetPixel(x, y);
+                        if (mappedBiomes.ContainsKey(pixel))
+                        {
+                            convertedCaveBiomeMap[x, y] = biomes.IndexOf(mappedBiomes[pixel]);
+                        }
+                        else
+                        {
+                            convertedCaveBiomeMap[x, y] = -1;
+                        }
+                    }
+                }
+
+                convertedBiomeMap = new IntGrid2D(biomeMap.width, biomeMap.height);
+                for (int x = 0; x < convertedBiomeMap.Width; x++)
+                {
+                    for (int y = 0; y < convertedBiomeMap.Height; y++)
+                    {
+                        Color32 pixel = biomeMap.GetPixel(x, y);
+                        if (mappedBiomes.ContainsKey(pixel))
+                        {
+                            convertedBiomeMap[x, y] = biomes.IndexOf(mappedBiomes[pixel]);
+                        }
+                        else
+                        {
+                            convertedBiomeMap[x, y] = -1;
+                        }
+                    }
+                }
+
+                convertedCaveMaxHeightMap = new FloatGrid2D(caveMaxHeightMap.width, caveMaxHeightMap.height);
+                for (int x = 0; x < convertedCaveMaxHeightMap.Width; x++)
+                {
+                    for (int y = 0; y < convertedCaveMaxHeightMap.Height; y++)
+                    {
+                        convertedCaveMaxHeightMap[x, y] = caveMaxHeightMap.GetPixel(x, y).r;
+                    }
+                }
+
+                convertedCaveMinHeightMap = new FloatGrid2D(caveMinHeightMap.width, caveMinHeightMap.height);
+                for (int x = 0; x < convertedCaveMinHeightMap.Width; x++)
+                {
+                    for (int y = 0; y < convertedCaveMinHeightMap.Height; y++)
+                    {
+                        convertedCaveMinHeightMap[x, y] = caveMinHeightMap.GetPixel(x, y).r;
+                    }
+                }
+
+                convertedHeightMap = new FloatGrid2D(heightMap.width, heightMap.height);
+                for (int x = 0; x < convertedHeightMap.Width; x++)
+                {
+                    for (int y = 0; y < convertedHeightMap.Height; y++)
+                    {
+                        convertedHeightMap[x, y] = heightMap.GetPixel(x, y).r;
+                    }
+                }
+            }
+        }
+
         private void Start()
         {
-            biomesArray = FindObjectsOfType<VoxelBiome>();
-            biomes.AddRange(biomesArray);
-
-            Dictionary<Color32, VoxelBiome> mappedBiomes = new Dictionary<Color32, VoxelBiome>();
-
-            foreach(VoxelBiome b in biomes)
-            {
-                if(b.isMapped)
-                {
-                    mappedBiomes[b.mappedColor] = b;
-                }
-            }
-
-            if(defaultBiome == null)
-            {
-                Debug.LogWarning($"It might be a good idea to specify a Default Biome.");
-            }
-
-            if(biomeMap == null)
-            {
-                throw new NullReferenceException($"Please specify a Biome Map before starting.");
-            }
-
-            if(!biomeMap.isReadable)
-            {
-                throw new InvalidOperationException($"Please make the texture \"{biomeMap.name}\" readable by navigating to it in the asset browser and ticking the Read/Write Checkbox and hitting Apply.");
-            }
-
-            if(biomeMap.format != TextureFormat.RGBA32)
-            {
-                throw new InvalidOperationException($"Please ensure that the pixel format of \"{biomeMap.name}\" is RGBA32 and that it is uncompressed.");
-            }
-
-            convertedCaveBiomeMap = new IntGrid2D(caveBiomeMap.width, caveBiomeMap.height);
-            for(int x = 0; x < convertedCaveBiomeMap.Width; x++)
-            {
-                for (int y = 0; y < convertedCaveBiomeMap.Height; y++)
-                {
-                    Color32 pixel = caveBiomeMap.GetPixel(x, y);
-                    if (mappedBiomes.ContainsKey(pixel))
-                    {
-                        convertedCaveBiomeMap[x, y] = biomes.IndexOf(mappedBiomes[pixel]);
-                    }
-                    else
-                    {
-                        convertedCaveBiomeMap[x, y] = -1;
-                    }
-                }
-            }
-            
-            convertedBiomeMap = new IntGrid2D(biomeMap.width, biomeMap.height);
-            for(int x = 0; x < convertedBiomeMap.Width; x++)
-            {
-                for (int y = 0; y < convertedBiomeMap.Height; y++)
-                {
-                    Color32 pixel = biomeMap.GetPixel(x, y);
-                    if (mappedBiomes.ContainsKey(pixel))
-                    {
-                        convertedBiomeMap[x, y] = biomes.IndexOf(mappedBiomes[pixel]);
-                    }
-                    else
-                    {
-                        convertedBiomeMap[x, y] = -1;
-                    }
-                }
-            }
-
-            convertedCaveMaxHeightMap = new FloatGrid2D(caveMaxHeightMap.width, caveMaxHeightMap.height);
-            for (int x = 0; x < convertedCaveMaxHeightMap.Width; x++)
-            {
-                for (int y = 0; y < convertedCaveMaxHeightMap.Height; y++)
-                {
-                    convertedCaveMaxHeightMap[x, y] = caveMaxHeightMap.GetPixel(x, y).r;
-                }
-            }
-
-            convertedCaveMinHeightMap = new FloatGrid2D(caveMinHeightMap.width, caveMinHeightMap.height);
-            for (int x = 0; x < convertedCaveMinHeightMap.Width; x++)
-            {
-                for (int y = 0; y < convertedCaveMinHeightMap.Height; y++)
-                {
-                    convertedCaveMinHeightMap[x, y] = caveMinHeightMap.GetPixel(x, y).r;
-                }
-            }
-
-            convertedHeightMap = new FloatGrid2D(heightMap.width, heightMap.height);
-            for (int x = 0; x < convertedHeightMap.Width; x++)
-            {
-                for (int y = 0; y < convertedHeightMap.Height; y++)
-                {
-                    convertedHeightMap[x, y] = heightMap.GetPixel(x, y).r;
-                }
-            }
+            Init();
         }
     }
 }
