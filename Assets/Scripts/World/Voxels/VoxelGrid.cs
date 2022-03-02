@@ -84,8 +84,26 @@ namespace FactoryZero.Voxels
         MeshRenderer mRenderer;
         MeshCollider mCollider;
 
+        private void OnDrawGizmosSelected()
+        {
+            for(int x = 0; x < size.x; x++)
+            {
+                for (int y = 0; y < size.y; y++)
+                {
+                    for (int z = 0; z < size.z; z++)
+                    {
+                        Vector3 pos = new Vector3(x, y, z) + (Vector3.one * 0.5f);
+                        if(this[x, y, z].Volume > 0.5f)
+                        {
+                            Gizmos.DrawCube(transform.position + pos, Vector3.one);
+                        }
+                    }
+                }
+            }
+        }
+
         bool hasInit = false;
-        void InitAll()
+        public void InitAll()
         {
             if(!hasInit)
             {
@@ -148,7 +166,14 @@ namespace FactoryZero.Voxels
 
             IVoxel[] voxels;
 
-            public MarchingGrid(GameWorld world, Vector3Int offset, Vector3Int size)
+            public enum NeighborChunk
+            {
+                main = 0,
+                forwardX = 1, 
+                forwardZ = 2
+            }
+
+            public MarchingGrid(WorldChunk[] neighbors, Vector3Int offset, Vector3Int size)
             {
                 this.size = size;
 
@@ -160,13 +185,51 @@ namespace FactoryZero.Voxels
                     {
                         for (int z = 0; z < size.z; z++)
                         {
-                            voxels[x + y * size.x + z * size.x * size.y] = world.GetVoxel(x + offset.x, offset.y + y, z + offset.y);
+                            NeighborChunk neighborIndex = NeighborChunk.main;
+
+
+                            Vector3Int worldPosition = new Vector3Int(x, offset.y + y, z);
+
+                            if (x >= neighbors[0].size.x)
+                            {
+                                neighborIndex |= NeighborChunk.forwardX;
+                                worldPosition.x -= neighbors[0].size.x;
+
+                            }
+                            if (z >= neighbors[0].size.z)
+                            {
+                                neighborIndex |= NeighborChunk.forwardZ;
+                                worldPosition.z -= neighbors[0].size.z;
+                            }
+
+                            WorldChunk nc = neighbors[(int)neighborIndex];
+
+                            IVoxel v;
+                            if (nc != null)
+                            {
+                                v = nc.GetVoxel(worldPosition);
+                            }
+                            else
+                            {
+                                v = neighbors[0].GetVoxel(Vector3Int.Min(Vector3Int.Max(Vector3Int.zero, new Vector3Int(x, y + offset.y, z)), neighbors[0].size - Vector3Int.one));
+                            }
+
+
+                            voxels[x + y * size.x + z * size.x * size.y] = v;
                         }
                     }
                 }
             }
 
-            public IVoxel this[int x, int y, int z] { get => voxels[x + y * size.x + z * size.x * size.y]; set => throw new NotImplementedException(); }
+            public IVoxel this[int x, int y, int z] 
+            {
+                get
+                {
+                    IVoxel v = voxels[x + y * size.x + z * size.x * size.y];
+                    return v;
+                }
+                set {}
+            }
 
             public int Width => size.x;
 
@@ -179,7 +242,14 @@ namespace FactoryZero.Voxels
 
         void RegenMesh()
         {
-            marching = new MarchingFunctionArgs(new MarchingGrid(chunk.world, new Vector3Int(chunk.index.x * chunk.size.x + bitIndex.x * chunk.voxelBitSize.x, bitIndex.y * chunk.voxelBitSize.y, chunk.index.y * chunk.size.z + bitIndex.z * chunk.voxelBitSize.z), size + Vector3Int.one), 0.5f);
+            WorldChunk[] chunks = new WorldChunk[4];
+
+            chunks[0] = chunk;
+            chunks[1] = chunk.world.GetChunk(chunk.index + new Vector2Int(1, 0));
+            chunks[2] = chunk.world.GetChunk(chunk.index + new Vector2Int(0, 1));
+            chunks[3] = chunk.world.GetChunk(chunk.index + new Vector2Int(1, 1));
+
+            marching = new MarchingFunctionArgs(new MarchingGrid(chunks, new Vector3Int(chunk.index.x * chunk.size.x + bitIndex.x * chunk.voxelBitSize.x, bitIndex.y * chunk.voxelBitSize.y, chunk.index.y * chunk.size.z + bitIndex.z * chunk.voxelBitSize.z), size + Vector3Int.one), 0.5f);
             chunk.marchingImpl.onMarch.Invoke(marching);
             updateMesh.ExecuteOnMainThread();
         }
@@ -198,16 +268,10 @@ namespace FactoryZero.Voxels
 
             inds.Add(new List<int>());
 
-            int tc = 0;
+            //int tc = 0;
             int smi = 0;
             foreach(MarchingMeshVertex[] tri in tris)
             {
-                if(tc + 3 > 12288)
-                {
-                    inds.Add(new List<int>());
-                    smi++;
-                }
-
                 foreach(MarchingMeshVertex vert in tri)
                 {
                     int vi = verts.IndexOf(vert.position);
@@ -227,11 +291,15 @@ namespace FactoryZero.Voxels
                 }
             }
 
+            if(tris.Count > 0)
+            {
+                // Debug.Log($"chunkBit{bitIndex.x}x{bitIndex.y}y{bitIndex.z}z.triangleCount = {tris.Count}");
+            }
+
             mesh.SetVertices(verts);
             mesh.SetUVs(0, uv0);
             mesh.SetUVs(1, uv1);
             mesh.SetUVs(2, uv2);
-
 
             int i;
 

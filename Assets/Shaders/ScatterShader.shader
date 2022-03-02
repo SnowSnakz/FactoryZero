@@ -62,13 +62,15 @@
             {
                 // sample the texture
 
+                float4 f = tex2D(_MainTex, i.uv);
+
                 float sceneZ = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE_PROJ(_CameraDepthTexture, UNITY_PROJ_COORD(i.screenPos)));
-                float depth = sceneZ - i.screenPos.z;
+                float depth = sceneZ - i.screenPos.z + (1 - f.a);
                 depth = saturate((abs(pow(depth, _DepthPow))) / _DepthFactor);;
 
                 float4 bc = tex2D(_Behind, i.uv);
                 float cp = (bc.r + bc.g + bc.b) * 0.33;
-                fixed4 col = lerp(tex2D(_MainTex, i.uv), bc, 1 - (depth * (1 - cp)));
+                fixed4 col = lerp(f, bc, 1 - (depth * (1 - cp)));
                 col.a = 1;
 
                 return col;

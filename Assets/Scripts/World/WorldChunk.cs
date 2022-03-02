@@ -1,8 +1,6 @@
 ﻿using FactoryZero.Interfaces;
 using FactoryZero.Marching;
 using FactoryZero.Voxels;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -48,18 +46,7 @@ namespace FactoryZero.Worlds
                             for (int y = 0; y < gridNum.y; y++)
                             {
                                 Vector3Int subGridIndex = new Vector3Int(x, y, z);
-                                int subGridIndex1d = subGridIndex.x + subGridIndex.y * gridNum.x + subGridIndex.z * gridNum.x * gridNum.z;
-
-                                /*
-                                Vector3Int neighborGridIndexX = new Vector3Int(x-1, y, z);
-                                int neighborGridIndexX1d = neighborGridIndexX.x + neighborGridIndexX.y * gridNum.x + neighborGridIndexX.z * gridNum.x * gridNum.z;
-
-                                Vector3Int neighborGridIndexY = new Vector3Int(x, y-1, z);
-                                int neighborGridIndexY1d = neighborGridIndexY.x + neighborGridIndexY.y * gridNum.x + neighborGridIndexY.z * gridNum.x * gridNum.z;
-
-                                Vector3Int neighborGridIndexZ = new Vector3Int(x, y, z-1);
-                                int neighborGridIndexZ1d = neighborGridIndexZ.x + neighborGridIndexZ.y * gridNum.x + neighborGridIndexZ.z * gridNum.x * gridNum.z;
-                                */
+                                int subGridIndex1d = subGridIndex.x + subGridIndex.y * gridNum.x + subGridIndex.z * gridNum.x * gridNum.y;
 
                                 GameObject go = new GameObject();
                                 go.name = $"{name}_Bit_{subGridIndex.x}x_{subGridIndex.y}y_{subGridIndex.z}z";
@@ -72,53 +59,7 @@ namespace FactoryZero.Worlds
                                 vg.size = voxelBitSize;
                                 vg.material = material;
 
-                                /*
-                                if (neighborGridIndexX1d > subGridIndex1d)
-                                {
-                                    if (neighborGridIndexX1d < grids.Length)
-                                    {
-                                        IGrid3D<IVoxel> ovg = grids[neighborGridIndexX1d];
-                                        for(int cy = 0; cy < voxelBitSize.y; cy++)
-                                        {
-                                            for (int cz = 0; cz <= voxelBitSize.z; cz++)
-                                            {
-                                                vg[voxelBitSize.x, cy, cz] = ovg[0, cy, cz];
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (neighborGridIndexY1d > subGridIndex1d)
-                                {
-                                    if (neighborGridIndexY1d < grids.Length)
-                                    {
-
-                                        IGrid3D<IVoxel> ovg = grids[neighborGridIndexY1d];
-                                        for (int cx = 0; cx <= voxelBitSize.x; cx++)
-                                        {
-                                            for (int cz = 0; cz <= voxelBitSize.z; cz++)
-                                            {
-                                                vg[cx, voxelBitSize.y, cz] = ovg[cx, 0, cz];
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (neighborGridIndexZ1d > subGridIndex1d)
-                                {
-                                    if (neighborGridIndexZ1d < grids.Length)
-                                    {
-                                        IGrid3D<IVoxel> ovg = grids[neighborGridIndexZ1d];
-                                        for (int cy = 0; cy < voxelBitSize.y; cy++)
-                                        {
-                                            for (int cz = 0; cz < voxelBitSize.y; cz++)
-                                            {
-                                                vg[voxelBitSize.x, cy, cz] = ovg[0, cy, cz];
-                                            }
-                                        }
-                                    }
-                                }
-                                */
+                                vg.InitAll();
 
                                 grids[subGridIndex1d] = vg;
                             }
@@ -133,18 +74,31 @@ namespace FactoryZero.Worlds
             InitAll();
 
             Vector3Int subGridIndex = new Vector3Int(pos.x / voxelBitSize.x, pos.y / voxelBitSize.y, pos.z / voxelBitSize.z);
-            int subGridIndex1d = subGridIndex.x + subGridIndex.y * gridNum.x + subGridIndex.z * gridNum.x * gridNum.z;
+            int subGridIndex1d = subGridIndex.x + subGridIndex.y * gridNum.x + subGridIndex.z * gridNum.x * gridNum.y;
 
-            Vector3Int sub = (subGridIndex * voxelBitSize);
+            Vector3Int sub = subGridIndex * voxelBitSize;
 
-            return grids[subGridIndex1d][pos.x - sub.x, pos.y - sub.y, pos.z - sub.z];
+            if(pos.x < 0 || pos.y < 0 || pos.z < 0)
+            {
+                return null;
+            }
+
+            if(pos.x >= size.x || pos.y >= size.y || pos.z >= size.z)
+            {
+                return null;
+            }
+
+            IGrid3D<IVoxel> voxelGrid = grids[subGridIndex1d];
+            IVoxel voxel = voxelGrid[pos.x - sub.x, pos.y - sub.y, pos.z - sub.z];
+
+            return voxel;
         }
 
         public void Read(BinaryReader reader)
         {
             InitAll();
 
-            hasGenerated = reader.ReadBoolean();
+           // hasGenerated = reader.ReadBoolean();
         }
 
         public void Write(BinaryWriter writer)

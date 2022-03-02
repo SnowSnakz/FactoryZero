@@ -13,8 +13,7 @@ namespace FactoryZero.Display
         private void Start()
         {
             Camera cam = GetComponent<Camera>();
-            cam.depthTextureMode = cam.depthTextureMode | DepthTextureMode.Depth;
+            cam.depthTextureMode |= DepthTextureMode.Depth;
         }
     }
-
 }

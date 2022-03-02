@@ -1,4 +1,5 @@
-﻿using FactoryZero.Voxels;
+﻿using FactoryZero.Marching;
+using FactoryZero.Voxels;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ namespace FactoryZero.Worlds
         public float dayCycleLength;
 
         public WorldGenerator generator;
+        public MarchingImpl marching;
         public WorldChunk chunkPrefab;
 
         Dictionary<Vector2Int, WorldChunk> chunks = new Dictionary<Vector2Int, WorldChunk>();
@@ -63,12 +65,12 @@ namespace FactoryZero.Worlds
         {
             WorldChunk v;
 
-            if (!chunks.TryGetValue(chunkIndex, out v))
+            if (chunks.TryGetValue(chunkIndex, out v))
             {
-                v = null;
+                return v;
             }
 
-            return v;
+            return null;
         }
 
         public WorldChunk LoadChunk(Vector2Int chunkIndex, bool generateOnLoad = true)
@@ -85,7 +87,7 @@ namespace FactoryZero.Worlds
             newChunk.index = chunkIndex;
             newChunk.world = this;
             newChunk.inUse = true;
-            newChunk.transform.position = new Vector3(chunkIndex.x * newChunk.size.x, 0, chunkIndex.y * newChunk.size.z);
+            newChunk.transform.position = new Vector3(chunkIndex.x * chunkPrefab.size.x, 0, chunkIndex.y * chunkPrefab.size.z);
             chunks.Add(chunkIndex, newChunk);
 
             /*
@@ -195,6 +197,8 @@ namespace FactoryZero.Worlds
                 {
                     shouldGenerate = false;
                 }
+
+                //chunks.Add(chunkIndex, targetChunk);
             }
 
             if(shouldGenerate)
@@ -205,26 +209,16 @@ namespace FactoryZero.Worlds
             return targetChunk;
         }
 
-        public IVoxel GetVoxel(int x, int y, int z)
+        public IVoxel GetVoxel(Vector3Int wpos)
         {
+            int x, y, z;
+            x = wpos.x;
+            y = wpos.y;
+            z = wpos.z;
+
             int nx, nz;
-            if (Math.Sign(x) < 0)
-            {
-                nx = Mathf.CeilToInt((float)Mathf.Abs(x) / chunkPrefab.size.x) * Math.Sign(x);
-            }
-            else
-            {
-                nx = Mathf.FloorToInt((float)Mathf.Abs(x) / chunkPrefab.size.x) * Math.Sign(x);
-            }
-            
-            if (Math.Sign(z) < 0)
-            {
-                nz = Mathf.CeilToInt((float)Mathf.Abs(z) / chunkPrefab.size.z) * Math.Sign(z);
-            }
-            else
-            {
-                nz = Mathf.FloorToInt((float)Mathf.Abs(z) / chunkPrefab.size.z) * Math.Sign(z);
-            }
+            nx = Mathf.FloorToInt((float)x / chunkPrefab.size.x) * Math.Sign(x);
+            nz = Mathf.FloorToInt((float)z / chunkPrefab.size.z) * Math.Sign(z);
 
             Vector2Int chunkIndex = new Vector2Int(nx, nz);
 
@@ -236,11 +230,14 @@ namespace FactoryZero.Worlds
 
                 Vector3Int pos = new Vector3Int(x - offset.x, y, z - offset.y);
 
-                return chunk.GetVoxel(pos);
+                IVoxel v = chunk.GetVoxel(pos);
+
+                return v;
             }
 
             return null;
         }
+
 
         public WorldChunk GetChunk(int x, int y)
         {
@@ -250,6 +247,8 @@ namespace FactoryZero.Worlds
         // Start is called before the first frame update
         void Start()
         {
+            marching.onMarch.Init();
+
             world = this;
 
             dataPath = $"{Application.persistentDataPath}/{dataPath}";
@@ -296,9 +295,9 @@ namespace FactoryZero.Worlds
 
                 chunks = new Dictionary<Vector2Int, WorldChunk>();
 
-                for (int x = -5; x < 6; x++)
+                for (int x = 0; x < 10; x++)
                 {
-                    for (int z = -5; z < 6; z++)
+                    for (int z = 0; z < 10; z++)
                     {
                         GenerateChunk(new Vector2Int(x, z), true, false);
                     }

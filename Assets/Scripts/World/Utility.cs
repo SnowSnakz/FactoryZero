@@ -9,15 +9,23 @@ namespace FactoryZero
 {
     public static class Utility
     {
+        public static bool debugTasks = false;
+
         public static void ExecuteOnMainThread(this Action action)
         {
             MainThreadActionExecutor.mainThreadActions.Enqueue(action);
         }
-        
 
         public static void ExecuteAsync(this Action action)
         {
-            new Task(action).Start();
+            if(debugTasks)
+            {
+                action?.Invoke();
+            }
+            else
+            {
+                new Task(action).Start();
+            }
         }
 
         public static void GenerateGridMesh(Quaternion direction, List<Vector3> vertices, List<int> indices, List<Vector2> uvs, Vector3 offset, int resolutionX, int resolutionY, float cellSizeX, float cellSizeY, bool clockwise = true)

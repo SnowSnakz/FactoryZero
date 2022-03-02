@@ -12,7 +12,7 @@
     }
     SubShader
     {
-        Tags { "RenderType" = "Transparent" "Queue" = "Transparent+100" }
+        Tags { "RenderType" = "Transparent" "Queue" = "Background+100" }
         LOD 200
             
         ZWrite Off

@@ -1,7 +1,5 @@
 ﻿using FactoryZero.Noise;
 using FactoryZero.Voxels;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace FactoryZero.Worlds.Generators
@@ -18,6 +16,8 @@ namespace FactoryZero.Worlds.Generators
         public VoxelMaterial stone;
 
         public VoxelBiome defaultBiome;
+
+        public float heightScale = 55;
 
         public void OnGenerate(GenerateFunctionArgs args)
         {
@@ -46,15 +46,49 @@ namespace FactoryZero.Worlds.Generators
                     generator.noise.onGenerateNoise.Invoke(xParam);
                     generator.noise.onGenerateNoise.Invoke(yParam);
 
-                    biomeParams.x = (xParam.Value + 1f) * 0.5f;
-                    biomeParams.y = (yParam.Value + 1f) * 0.5f;
+                    biomeParams.x = Mathf.Abs(xParam.Value);
+                    biomeParams.y = Mathf.Abs(yParam.Value);
 
-                    float height = world.biomeManager.GetHeightByParameters(biomeParams.x, biomeParams.y) * chunk.size.y;
+                    float height = world.biomeManager.GetHeightByParameters(xParam.Value, yParam.Value) * heightScale;
 
-                    for(int y = 0; y < Mathf.Min(height, chunk.size.y); y++)
+                    xParam = new NoiseFunctionArgs(seed, new Vector3(chunkOffset.x + x - 1, chunkOffset.y + z, biomeParamsXConstant), NoiseFunctionArgs.SamplerType.Is3D);
+                    yParam = new NoiseFunctionArgs(seed, new Vector3(chunkOffset.x + x - 1, chunkOffset.y + z, biomeParamsYConstant), NoiseFunctionArgs.SamplerType.Is3D);
+
+                    generator.noise.onGenerateNoise.Invoke(xParam);
+                    generator.noise.onGenerateNoise.Invoke(yParam);
+
+                    height += world.biomeManager.GetHeightByParameters(xParam.Value, yParam.Value) * heightScale;
+
+                    xParam = new NoiseFunctionArgs(seed, new Vector3(chunkOffset.x + x, chunkOffset.y + z - 1, biomeParamsXConstant), NoiseFunctionArgs.SamplerType.Is3D);
+                    yParam = new NoiseFunctionArgs(seed, new Vector3(chunkOffset.x + x, chunkOffset.y + z - 1, biomeParamsYConstant), NoiseFunctionArgs.SamplerType.Is3D);
+
+                    generator.noise.onGenerateNoise.Invoke(xParam);
+                    generator.noise.onGenerateNoise.Invoke(yParam);
+
+                    height += world.biomeManager.GetHeightByParameters(xParam.Value, yParam.Value) * heightScale;
+
+                    xParam = new NoiseFunctionArgs(seed, new Vector3(chunkOffset.x + x + 1, chunkOffset.y + z, biomeParamsXConstant), NoiseFunctionArgs.SamplerType.Is3D);
+                    yParam = new NoiseFunctionArgs(seed, new Vector3(chunkOffset.x + x + 1, chunkOffset.y + z, biomeParamsYConstant), NoiseFunctionArgs.SamplerType.Is3D);
+
+                    generator.noise.onGenerateNoise.Invoke(xParam);
+                    generator.noise.onGenerateNoise.Invoke(yParam);
+
+                    height += world.biomeManager.GetHeightByParameters(xParam.Value, yParam.Value) * heightScale;
+
+                    xParam = new NoiseFunctionArgs(seed, new Vector3(chunkOffset.x + x, chunkOffset.y + z + 1, biomeParamsXConstant), NoiseFunctionArgs.SamplerType.Is3D);
+                    yParam = new NoiseFunctionArgs(seed, new Vector3(chunkOffset.x + x, chunkOffset.y + z + 1, biomeParamsYConstant), NoiseFunctionArgs.SamplerType.Is3D);
+
+                    generator.noise.onGenerateNoise.Invoke(xParam);
+                    generator.noise.onGenerateNoise.Invoke(yParam);
+
+                    height += world.biomeManager.GetHeightByParameters(xParam.Value, yParam.Value) * heightScale;
+
+                    height /= 5;
+
+                    for (int y = 0; y < Mathf.Min(height, chunk.size.y); y++)
                     {
                         IVoxel voxel = chunk.GetVoxel(new Vector3Int(x, y, z));
-                        voxel.Volume = Mathf.Clamp01((height - y) / 3f);
+                        voxel.Volume = Mathf.Clamp01((height - y) / 6f);
                         voxel.BiomeParameters = biomeParams;
                         voxel.Biome = world.biomeManager.GetBiomeByParameters(biomeParams.x, biomeParams.y, height, false) ?? defaultBiome;
                         

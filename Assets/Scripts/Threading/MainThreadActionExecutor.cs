@@ -17,10 +17,12 @@ namespace FactoryZero.Threading
 
         public TimeSpan threadSleepTime = TimeSpan.FromMilliseconds(100);
 
-        Thread[] threads;
+        // Thread[] threads;
         private void Start()
         {
             run = true;
+
+            /*
             threads = new Thread[threadCount];
 
             for(int i = 0; i < threadCount; i++)
@@ -30,6 +32,7 @@ namespace FactoryZero.Threading
 
                 threads[i] = t;
             }
+            */
         }
 
         ~MainThreadActionExecutor()
@@ -41,7 +44,7 @@ namespace FactoryZero.Threading
         {
             run = false;
         }
-
+        /*
         void AltThread()
         {
             while(run)
@@ -68,20 +71,14 @@ namespace FactoryZero.Threading
                 Thread.Sleep(stopTime - stopTime);
             }
         }
+        */
 
         void FixedUpdate()
         {
-            DateTime startTime = DateTime.UtcNow;
             while (mainThreadActions.Count > 0)
             {
                 Action action = mainThreadActions.Dequeue();
                 action?.Invoke();
-
-                DateTime stopTime = DateTime.UtcNow;
-                if(stopTime - startTime >= TimeSpan.FromMilliseconds(10))
-                {
-                    break;
-                }
             }
         }
     }
